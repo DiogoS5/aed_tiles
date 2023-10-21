@@ -24,8 +24,7 @@ node* addToList(node* curr, int line, int column){
 }
 
 void printList(FILE* outfp, node* head){
-    node* aux = (node*)calloc(sizeof(node), 1);
-    aux = head;
+    node* aux = head;
     while(aux != NULL){
         fprintf(outfp, "%d %d\n", aux->l + 1, aux->c + 1);
         aux = aux->next;
