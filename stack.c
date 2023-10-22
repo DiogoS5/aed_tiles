@@ -7,6 +7,7 @@ void stackPush(node** head, int line, int column){
     node* tile = (node*)calloc(sizeof(node), 1);
     //validate
     if(tile == NULL){
+        printf("allocation error push");
         exit(EXIT_FAILURE);
     }
 
@@ -25,6 +26,7 @@ void stackPush(node** head, int line, int column){
 void stackPop(node** head){
     node *discard;
     if (head == NULL){
+        printf("no head stack");
         exit(EXIT_FAILURE);
     }
     else{

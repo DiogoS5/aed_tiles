@@ -13,4 +13,4 @@ void stackPop(node** head);
 
 void deleteStack(node** head);
 
-#endif    // STACK_H
+#endif

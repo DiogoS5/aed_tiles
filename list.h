@@ -9,4 +9,4 @@ void printList(FILE* outfp, node* head);
 
 void deleteList(node* head);
 
-#endif    // LIST_H
+#endif

@@ -3,7 +3,7 @@
 
 #include "reading.h"
 
-int** allocTiles(FILE* fp, int lines, int columns){
+int** allocTiles(int lines, int columns){
     int** tiles = (int**)calloc(lines, sizeof(int*)); //alloc lines
 
     for (int l = 0; l < lines; l++){
