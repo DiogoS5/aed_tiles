@@ -3,8 +3,8 @@
 
 #include "board_stack.h"
 
-void boardPush(board** head, int** tiles, int score, int play[], node* possible_plays){
-    board* new_board = (board*)calloc(sizeof(board), 1);
+board* boardAlloc(int** tiles, int score, int play_l, int play_c, node* possible_plays){
+    board* new_board = (board*)malloc(sizeof(board));
     //validate
     if(new_board == NULL){
         printf("allocation error push");
@@ -13,20 +13,24 @@ void boardPush(board** head, int** tiles, int score, int play[], node* possible_
 
     new_board->tiles = tiles;
     new_board->score = score;
-    new_board->play[0] = play[0];
-    new_board->play[1] = play[1];
+    new_board->play_l = play_c;
+    new_board->play_l = play_c;
     new_board->possible_plays = possible_plays;
 
+    return new_board;
+}
+
+void boardPush(board** head, board* board){
     if(*head == NULL){   
-        *head = new_board; //new head
+        *head = board; //new head
     }
     else{
-        new_board->next = *head;
-        *head = new_board; //replaces head
+        board->next = *head;
+        *head = board; //replaces head
     }
 }
 
-void boardPop(board** head){
+void boardPop(board** head, int lines){
     board *discard;
     if (head == NULL){
         printf("no head stack");
@@ -35,13 +39,11 @@ void boardPop(board** head){
     else{
         discard = *head;
         *head = (*head)->next;
+        for (int l = 0; l < lines; l++) {
+            if (discard->tiles[l] != NULL) {
+                free(discard->tiles[l]);
+            }
+        }
         free(discard);
-    }
-}
-
-void deleteBoardStack(board** head){
-    if(*head == NULL){
-        printf("no stack to delete\n");
-        exit(0);
     }
 }

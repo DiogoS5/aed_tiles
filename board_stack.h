@@ -6,15 +6,16 @@
 typedef struct _board {
     int** tiles;
     int score;      //current score
-    int play[2];        //play that led to this board been created
-    node* possible_plays;        //list of possible plays
+    int play_c;        //play that led to this board been created
+    int play_l; 
+    node* possible_plays;        //stack of possible plays
     struct _board *next;
 } board;
 
-void boardsPush(board** head, int** tiles, int score, int play);
+board* boardAlloc(int** tiles, int score, int play_l, int play_c, node* possible_plays);
 
-void boardsPop(board** head);
+void boardPush(board** head, board* board);
 
-void boardsStack(board** head);
+void boardPop(board** head, int lines);
 
 #endif

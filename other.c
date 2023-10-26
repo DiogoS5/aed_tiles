@@ -7,6 +7,7 @@
 #include "board_stack.h"
 #include "list.h"
 #include "gravity.h"
+#include "other.h"
 
 void mode1(FILE* outfp, int** tiles, int lines, int columns){
     int reset = 1, plays = 0, score = 0, counter = 0, value = 0;
@@ -82,6 +83,50 @@ void mode1(FILE* outfp, int** tiles, int lines, int columns){
     printList(outfp, groups_head); 
     deleteList(groups_head); 
 
+}
+
+board* play(board* board, int play_l, int play_c, int lines, int columns){
+    node* stack_head = NULL;
+    int counter = 0; //initialize tile counter
+
+    int** new_tiles = copyTiles(lines, columns, board->tiles);
+
+    int value = new_tiles[play_l][play_c];
+
+    stackPush(&stack_head, play_l, play_l);
+    while(stack_head != NULL){
+        int l = stack_head->l;
+        int c = stack_head->c;
+        stackPop(&stack_head);
+
+        if (new_tiles[l][c] == value){
+
+            new_tiles[l][c] = -1;
+            counter += 1;
+
+            if(l + 1 < lines){
+                stackPush(&stack_head, l + 1, c);
+            }
+            if(l - 1 >= 0){
+                stackPush(&stack_head, l - 1, c);
+            }
+            if(c + 1 < columns){
+                stackPush(&stack_head, l, c + 1);
+            }
+            if(c - 1 >= 0){
+                stackPush(&stack_head, l, c - 1);
+            }
+        }
+    }
+
+    int new_score = board->score + counter*(counter-1); //print score
+    
+    new_tiles = verticalGravity(lines, columns, new_tiles);
+    new_tiles = horizontalGravity(lines, columns, new_tiles);
+
+    node* possible_plays = findPlays(new_tiles, lines, columns);
+
+    return boardAlloc(new_tiles, new_score, play_l, play_c, possible_plays);
 }
 
 //IDEIA: implement there is hope
@@ -168,3 +213,22 @@ node* findPlays(int** tiles, int lines, int columns){
     return possible_plays_head;
 }
 
+void mode2(FILE* outfp, int** tiles, int lines, int columns){
+    node* possible_plays = findPlays(tiles, lines, columns);
+    board* board_head = NULL;
+    board* new_board = boardAlloc(tiles, 0, 0, 0, possible_plays);
+    boardPush(&board_head, new_board);
+
+    while(board_head != NULL){
+        boardPop(&board_head, lines);
+        while(possible_plays != NULL){
+            board* new_board = play(board_head, possible_plays->l, possible_plays->c, lines, columns);
+            boardPush(&board_head, new_board);
+            
+            //delete play and move to next
+            node* discard = possible_plays;
+            possible_plays = possible_plays->next;
+            free(discard);
+        }
+    }
+}

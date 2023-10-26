@@ -35,10 +35,3 @@ void stackPop(node** head){
         free(discard);
     }
 }
-
-void deleteStack(node** head){
-    if(*head == NULL){
-        printf("no stack to delete\n");
-        exit(0);
-    }
-}

@@ -11,6 +11,4 @@ void stackPush(node** head, int line, int column);
 
 void stackPop(node** head);
 
-void deleteStack(node** head);
-
 #endif
