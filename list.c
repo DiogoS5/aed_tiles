@@ -4,7 +4,7 @@
 #include "list.h"
 
 node* addToList(node* curr, int line, int column){
-    node* block = (node*)calloc(sizeof(node), 1);
+    node* block = (node*)calloc(1, sizeof(node));
     //validate
     if(block == NULL){
         exit(EXIT_FAILURE);

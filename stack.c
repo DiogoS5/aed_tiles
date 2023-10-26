@@ -4,7 +4,7 @@
 #include "stack.h"
 
 void stackPush(node** head, int line, int column){
-    node* tile = (node*)calloc(sizeof(node), 1);
+    node* tile = (node*)calloc(1, sizeof(node));
     //validate
     if(tile == NULL){
         printf("allocation error push");
