@@ -35,3 +35,13 @@ void stackPop(node** head){
         free(discard);
     }
 }
+
+void printStack(FILE* outfp, node* head){
+    node* aux = head;
+    while(aux != NULL){
+        fprintf(outfp, "%d %d\n", aux->l + 1, aux->c + 1);
+        aux = aux->next;
+    }
+    fprintf(outfp, "\n");
+    free(aux);
+}

@@ -69,14 +69,14 @@ int main(int argc, char *argv[]) {
         tiles = readTiles(fp, lines, columns, tiles);
         
         if(mode == -1){
-            //node* possible_plays = findPlays(tiles, lines, columns);
-            //printf(outfp, "possible plays:\n");
-            //printList(outfp, possible_plays_head);
-            //deleteList(possible_plays_head);
+            node* possible_plays = findPlays(tiles, lines, columns);
+            fprintf(outfp, "possible plays:\n");
+            printList(outfp, possible_plays);
+            deleteList(possible_plays);
             mode1(outfp, tiles, lines, columns);
         }
-        else if(mode == 2){
-            printf("ye");
+        else if(mode == -3){
+            mode2(outfp, tiles, lines, columns);
         }   
         //Frees
         for (int l = 0; l < lines; l++) {

@@ -11,4 +11,6 @@ void stackPush(node** head, int line, int column);
 
 void stackPop(node** head);
 
+void printStack(FILE* outfp, node* head);
+
 #endif
