@@ -85,15 +85,15 @@ void mode1(FILE* outfp, int** tiles, int lines, int columns){
 
 }
 
-board* play(board* board, int play_l, int play_c, int lines, int columns){
+board* play(board* board, node* plays, node* play, int lines, int columns){
     node* stack_head = NULL;
     int counter = 0; //initialize tile counter
 
     int** new_tiles = copyTiles(lines, columns, board->tiles);
 
-    int value = new_tiles[play_l][play_c];
+    int value = new_tiles[play->l][play->c];
 
-    stackPush(&stack_head, play_l, play_l);
+    stackPush(&stack_head, play->l, play->l);
     while(stack_head != NULL){
         int l = stack_head->l;
         int c = stack_head->c;
@@ -126,7 +126,9 @@ board* play(board* board, int play_l, int play_c, int lines, int columns){
 
     node* possible_plays = findPlays(new_tiles, lines, columns);
 
-    return boardAlloc(new_tiles, new_score, play_l, play_c, possible_plays);
+    stackPush(&plays, play->l, play->c);
+    
+    return boardAlloc(new_tiles, new_score, plays, possible_plays);
 }
 
 //IDEIA: implement there is hope
@@ -215,19 +217,20 @@ node* findPlays(int** tiles, int lines, int columns){
 
 void mode2(FILE* outfp, int** tiles, int lines, int columns){
     node* possible_plays = findPlays(tiles, lines, columns);
+    node* plays = NULL;
     board* board_head = NULL;
-    board* new_board = boardAlloc(tiles, 0, 0, 0, possible_plays);
+    board* new_board = boardAlloc(tiles, 0, plays, possible_plays);
     boardPush(&board_head, new_board);
 
     while(board_head != NULL){
         boardPop(&board_head, lines);
-        while(possible_plays != NULL){
-            board* new_board = play(board_head, possible_plays->l, possible_plays->c, lines, columns);
+        while(board_head->possible_plays != NULL){
+            board* new_board = play(board_head, board_head->plays, board_head->possible_plays, lines, columns);
             boardPush(&board_head, new_board);
             
             //delete play and move to next
-            node* discard = possible_plays;
-            possible_plays = possible_plays->next;
+            node* discard = board_head->possible_plays;
+            board_head->possible_plays = board_head->possible_plays->next;
             free(discard);
         }
     }

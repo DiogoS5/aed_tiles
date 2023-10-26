@@ -3,7 +3,7 @@
 
 #include "board_stack.h"
 
-board* boardAlloc(int** tiles, int score, int play_l, int play_c, node* possible_plays){
+board* boardAlloc(int** tiles, int score, node* plays, node* possible_plays){
     board* new_board = (board*)malloc(sizeof(board));
     //validate
     if(new_board == NULL){
@@ -13,8 +13,7 @@ board* boardAlloc(int** tiles, int score, int play_l, int play_c, node* possible
 
     new_board->tiles = tiles;
     new_board->score = score;
-    new_board->play_l = play_c;
-    new_board->play_l = play_c;
+    new_board->plays = plays;
     new_board->possible_plays = possible_plays;
 
     return new_board;

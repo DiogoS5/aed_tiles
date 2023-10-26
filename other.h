@@ -4,7 +4,8 @@
 #include "stack.h"
 
 void mode1(FILE* outfp, int** tiles, int lines, int columns);
-board* play(board* board, int play_l, int play_c, int lines, int columns);
+board* play(board* board, node* plays, node* play, int lines, int columns);
 node* findPlays(int** tiles, int lines, int columns);
+void mode2(FILE* outfp, int** tiles, int lines, int columns);
 
 #endif
