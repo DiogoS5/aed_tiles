@@ -45,3 +45,17 @@ void printStack(FILE* outfp, node* head){
     fprintf(outfp, "\n");
     free(aux);
 }
+
+int copyReversedStack(node* original, node** reversed) {
+    int plays_counter = 0;
+    // Iterate through the source stack and push its elements onto the reversed stack
+    while (original != NULL) {
+        stackPush(reversed, original->l, original->c);
+        original = original->next;
+        plays_counter++;
+    }
+
+    return plays_counter;
+}
+
+

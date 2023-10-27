@@ -3,7 +3,7 @@
 
 #include "board_stack.h"
 
-board* boardAlloc(int** tiles, int score, node* plays, node* possible_plays){
+board* boardAlloc(int** tiles, int score, node* possible_plays){
     board* new_board = (board*)malloc(sizeof(board));
     //validate
     if(new_board == NULL){
@@ -13,9 +13,8 @@ board* boardAlloc(int** tiles, int score, node* plays, node* possible_plays){
 
     new_board->tiles = tiles;
     new_board->score = score;
-    new_board->plays = plays;
     new_board->possible_plays = possible_plays;
-
+    new_board->next = NULL;
     return new_board;
 }
 
@@ -30,19 +29,13 @@ void boardPush(board** head, board* board){
 }
 
 void boardPop(board** head, int lines){
-    board *discard;
     if (head == NULL){
         printf("no head stack");
         exit(EXIT_FAILURE);
     }
     else{
-        discard = *head;
+        board* discard = *head;
         *head = (*head)->next;
-        for (int l = 0; l < lines; l++) {
-            if (discard->tiles[l] != NULL) {
-                free(discard->tiles[l]);
-            }
-        }
         free(discard);
     }
 }

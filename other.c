@@ -125,7 +125,7 @@ board* play(board* board, node* play, int lines, int columns){
 
     node* possible_plays = findPlays(new_tiles, lines, columns);
 
-    return boardAlloc(new_tiles, new_score, play, possible_plays);
+    return boardAlloc(new_tiles, new_score, possible_plays);
 }
 
 //IDEIA: implement there is hope
@@ -212,48 +212,48 @@ node* findPlays(int** tiles, int lines, int columns){
     return possible_plays_head;
 }
 
-void mode2(FILE* outfp, int** tiles, int lines, int columns){
+void mode2(FILE* outfp, int** tiles, int lines, int columns, int min_score){
+    int plays_counter;
+
     node *final_plays_head = NULL;
     node *plays_head = NULL;
     int final_score = 0;
+
     //alloc and push first board
     node* head_possible_plays = findPlays(tiles, lines, columns);
     board* board_head = NULL;
-    board* new_board = boardAlloc(tiles, 0, (node*) NULL, head_possible_plays);
+    board* new_board = boardAlloc(tiles, 0, head_possible_plays);
     boardPush(&board_head, new_board);
-    
     //DFS
     while(board_head != NULL){
-        board* board_cur = boardPop(&board_head, lines);
-        if(board_cur->play != NULL){
-            stackPush(&plays_head, board_cur->play->l, board_cur->play->c);
-            printf("played %d %d\n", board_cur->play->l, board_cur->play->c);
-        }
-        printf("%d\n", board_cur->score);
+        if(board_head->possible_plays != NULL){
+            board* new_board = play(board_head, board_head->possible_plays, lines, columns);
+            stackPush(&plays_head, board_head->possible_plays->l, board_head->possible_plays->c);
+            //delete play and move to next
+            node* discard = board_head->possible_plays;
+            board_head->possible_plays = board_head->possible_plays->next;
+            free(discard);
 
-        if(board_cur->possible_plays == NULL){ //check if it has reached an end
-            if(board_cur->score > final_score){
-                final_score = board_cur->score;
-                fprintf(outfp, "%d\n", final_score);
-                printStack(outfp, plays_head);
-                return;
-                //node *final_plays_head = funcao para copiar stack;
+            boardPush(&board_head, new_board);
+            if(board_head->possible_plays == NULL){ //check if it has reached an end
+                if(board_head->score > final_score){
+                    final_score = board_head->score;
+                    plays_counter = copyReversedStack(plays_head, &final_plays_head);
+                    if (final_score >= min_score){
+                        break;
+                    }
+                }
             }
         }
-        
-        while(board_cur->possible_plays != NULL){ //play all possible plays
-            printf("%d %d\n",board_cur->possible_plays->l, board_cur->possible_plays->c);
-            board* new_board = play(board_cur, board_cur->possible_plays, lines, columns);
-            boardPush(&board_head, new_board);
-            
-            //delete play and move to next
-            //printList(outfp, board_cur->possible_plays);
-            node* discard = board_cur->possible_plays;
-            board_cur->possible_plays = board_cur->possible_plays->next;
-            free(discard);
-        }      
+        else{
+            boardPop(&board_head, lines);
+            if(board_head != NULL){
+                stackPop(&plays_head);
+            }
+        }
     }
-
+    fprintf(outfp, "%d %d\n", plays_counter, final_score);
+    printStack(outfp, final_plays_head); //PRINT REVERSE
     //fprintf(outfp, "%d %d\n", plays, score);
     //printList(outfp, plays); 
     //deleteList(groups_head);

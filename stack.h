@@ -13,4 +13,6 @@ void stackPop(node** head);
 
 void printStack(FILE* outfp, node* head);
 
+int copyReversedStack(node* original, node** reversed);
+
 #endif
