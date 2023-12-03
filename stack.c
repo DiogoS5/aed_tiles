@@ -3,40 +3,32 @@
 
 #include "stack.h"
 
-void stackPush(node** head, int line, int column){
+void stackPush(int line, int column){
     node* tile = (node*)calloc(sizeof(node), 1);
     //validate
     if(tile == NULL){
         exit(EXIT_FAILURE);
     }
-
     tile->l = line;
     tile->c = column;
 
-    if(*head == NULL){   
-        *head = tile; //new head
+    if(head == NULL){   
+        head = tile; //new head
     }
     else{
-        tile->next = *head;
-        *head = tile; //replaces head
+        tile->next = head;
+        head = tile; //replaces head
     }
 }
 
-void stackPop(node** head){
+void stackPop(){
     node *discard;
     if (head == NULL){
         exit(EXIT_FAILURE);
     }
     else{
-        discard = *head;
-        *head = (*head)->next;
+        discard = head;
+        head = head->next;
         free(discard);
-    }
-}
-
-void deleteStack(node** head){
-    if(*head == NULL){
-        printf("no stack to delete\n");
-        exit(0);
     }
 }

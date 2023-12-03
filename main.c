@@ -4,145 +4,111 @@
 
 #include "reading.h"
 #include "stack.h"
-#include "list.h"
 #include "gravity.h"
+
+node* head = NULL; //initialize head of stack
+
 int main(int argc, char *argv[]) {
-    int lines, columns, mode;
-    int reset, plays, score = 0, counter = 0, value = 0;
-    node* stack_head = NULL, *groups_head = NULL, *groups_curr = NULL;
-    FILE* fp, *outfp;
+    int lines, columns, variant, line, column;
+    FILE* fp;
 
     if (argc < 2) {//there must be a file name
         exit(0);
     }
 
-    fp = fopen(argv[1], "r"); //open input file
+    char* suffix = (char*)malloc(12*sizeof(char));
+    strcpy(suffix, argv[1] + strlen(argv[1]) - 11);
+
+    char* prefix = (char*)malloc((strlen(argv[1]) - strlen(suffix))*sizeof(char));
+    strncpy(prefix, argv[1], strlen(argv[1]) - strlen(suffix));
+
+    if(strcmp(suffix, ".tilewalls1") != 0){
+        exit(0);
+    }
+    fp = fopen(argv[1], "r");
     if (fp == (NULL)) {
         exit(0);
     }
 
-    // Find the last occurrence of ".tilewalls1"
-    const char* lastDotTilewalls1 = strrchr(argv[1], '.');
-    if (lastDotTilewalls1 != NULL) {
-        // Check if the substring after the last occurrence of ".tilewalls1" is ".tilewalls1"
-        if (strcmp(lastDotTilewalls1, ".tilewalls") == 0) {
-            // Calculate the length of the desired part
-            size_t prefix_len = (lastDotTilewalls1 - argv[1]);
+    char *outfilename = (char*) malloc(strlen(argv[1])+12);
 
-            char outfilename[prefix_len + 11 + 1];
-            strncpy(outfilename, argv[1], prefix_len);
-            outfilename[prefix_len] = '\0';
-
-            if (outfilename != NULL) {
-                strcat(outfilename, ".tyleblasts");
-            }
-            else{
-                printf("NULL\n");
-                exit(0);
-            }
-
-            outfp = (FILE*)fopen(outfilename, "w");
-
-        } else {
-            printf("No '.tilewalls' found at the end of the filename.\n");
-            exit(0);
-        }
-    } else {
-        printf("No '.' found in the filename.\n");
+    if (outfilename != NULL) {
+        strcpy(outfilename, prefix);
+        strcat(outfilename, ".singlestep");
+    }
+    else{
         exit(0);
     }
 
+    FILE* outfp = fopen(outfilename, "w");
 
-    while(fscanf(fp, "%d %d %d", &lines, &columns, &mode) == 3){ //read problem
-        if (!(mode == -1 || mode == -3 || mode >= 0)) { //check if it's a valid problem
-            fprintf(outfp, "%d %d %d\n", lines, columns, mode); //print invalid (output)
+
+    while(fscanf(fp, "%d %d %d %d %d", &lines, &columns, &variant, &line, &column) == 5){ //read problem
+        if (!(variant == 1 || variant == 2) || !(line > 0 && line <= lines) || !(column > 0 && column <= columns) ) { //check if it's a valid problem
+            fprintf(outfp, "%d %d %d %d %d\n\n", lines, columns, variant, line, column); //print invalid (output)
             skipTiles(fp, lines, columns); //read and ignore problem
             continue; //skip to next iteration
         }
 
-        fprintf(outfp, "%d %d %d\n", lines, columns, mode); //print valid
+        fprintf(outfp, "%d %d %d %d %d\n", lines, columns, variant, line, column); //print valid
+
+        line -= 1; //adjusting because lines and columns start in 0
+        column -= 1;
+
+        int counter = 0; //initialize tile counter
 
         int** tiles = allocTiles(fp, lines, columns);
 
         tiles = readTiles(fp, lines, columns, tiles);
-        
-        reset = 1;
-        plays = 0;
-        score = 0;
-        groups_head = NULL;
-        groups_curr = NULL;
 
-        while(reset){
-            reset = 0;
-            for(int line = 0; line < lines; line++){
-                for(int column = 0; column < columns; column++){     
-                    counter = 0; //initialize tile counter
-                    value = tiles[line][column];
 
-                    if(value > 0){ //search for group
+        int value = tiles[line][column];
 
-                        stackPush(&stack_head, line, column);
-                        while(stack_head != NULL){
-                            int l = stack_head->l;
-                            int c = stack_head->c;
+        stackPush(line, column);
 
-                            stackPop(&stack_head);
-                            if (tiles[l][c] == value){
-                                tiles[l][c] = -1;
-                                counter += 1;
+        if(value > 0){
+            while(head != NULL){
+                int l = head->l;
+                int c = head->c;
+                stackPop(head);
+                if (tiles[l][c] == value){
+                    tiles[l][c] = -1;
+                    counter += 1;
 
-                                if(l + 1 < lines){
-                                    stackPush(&stack_head, l + 1, c);
-                                }
-                                if(l - 1 >= 0){
-                                    stackPush(&stack_head, l - 1, c);
-                                }
-                                if(c + 1 < columns){
-                                    stackPush(&stack_head, l, c + 1);
-                                }
-                                if(c - 1 >= 0){
-                                    stackPush(&stack_head, l, c - 1);
-                                }
-                            }
-                        }
+                    if(l + 1 < lines){
+                        stackPush(l + 1, c);
                     }
-                    else{ //not a colour
-                        continue;
+                    if(l - 1 >= 0){
+                        stackPush(l - 1, c);
                     }
-
-                    if(counter == 1){ //only one tile
-                        tiles[line][column] = value; //return tile to original value
-                        continue;
+                    if(c + 1 < columns){
+                        stackPush(l, c + 1);
                     }
-                    //there was a group
-                    if(groups_head == NULL){
-                        groups_head = addToList(groups_curr, line, column);
-                        groups_curr = groups_head;
+                    if(c - 1 >= 0){
+                        stackPush(l, c - 1);
                     }
-                    else{
-                        groups_curr = addToList(groups_curr, line, column);
-                    }
-                    
-                    tiles = verticalGravity(lines, columns, tiles);
-                    tiles = horizontalGravity(lines, columns, tiles);
-
-                    score += counter*(counter-1); //print score
-                    plays += 1;
-
-                    reset = 1;
-                    break;
-                }
-                if(reset){
-                    break;
                 }
             }
         }
+        else{
+            counter = 1;
+        }
 
-        fprintf(outfp, "%d %d\n", plays, score);
-        printList(outfp, groups_head); 
-        deleteList(groups_head); 
-        //outputTiles(outfp, lines, columns, tiles);   
-            
+        if(counter == 1){ //if it was only one tile
+            tiles[line][column] = value; //return tile to original value
+        }
+
+        //Variants
+        if(variant == 1){
+            fprintf(outfp, "%d\n\n", counter*(counter-1)); //print score
+        }
+        else{ //variant 2
+            tiles = verticalGravity(lines, columns, tiles);
+            tiles = horizontalGravity(lines, columns, tiles);
+
+            outputTiles(outfp, lines, columns, tiles);
+        }
+
         //Frees
         for (int l = 0; l < lines; l++) {
             if (tiles[l] != NULL) {
@@ -150,11 +116,11 @@ int main(int argc, char *argv[]) {
             }
         }
         free(tiles);
-        }
+    }
 
     //free files
     fclose(fp);
     fclose(outfp);
+
     return 0;
 }
-

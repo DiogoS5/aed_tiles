@@ -7,10 +7,10 @@ typedef struct _node {
     struct _node *next;
 } node;
 
-void stackPush(node** head, int line, int column);
+extern node* head;
 
-void stackPop(node** head);
+void stackPush(int line, int column);
 
-void deleteStack(node** head);
+void stackPop();
 
 #endif    // STACK_H
