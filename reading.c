@@ -3,7 +3,7 @@
 
 #include "reading.h"
 
-int** allocTiles(FILE* fp, int lines, int columns){
+int** allocTiles(int lines, int columns){
     int** tiles = (int**)calloc(lines, sizeof(int*)); //alloc lines
 
     for (int l = 0; l < lines; l++){
@@ -28,14 +28,14 @@ int** readTiles(FILE* fp, int lines, int columns, int** tiles){
     return tiles;
 }
 
-void outputTiles(FILE* outfp, int lines, int columns, int** tiles){
+int** copyTiles(int lines, int columns, int** tiles){
+    int** new_tiles = allocTiles(lines, columns);
     for(int l = lines - 1; l >= 0; l--){
         for(int c = 0; c < columns; c++){
-            fprintf(outfp, "%d ", tiles[l][c]);
+            new_tiles[l][c] = tiles[l][c];
         }
-        fprintf(outfp, "\n");
     }
-    fprintf(outfp, "\n");
+    return new_tiles;
 }
 
 void skipTiles(FILE* fp, int lines, int columns){

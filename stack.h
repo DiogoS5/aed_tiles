@@ -7,10 +7,26 @@ typedef struct _node {
     struct _node *next;
 } node;
 
-extern node* head;
+typedef struct _occurrences {
+    int number;  // numero lido
+    int counter; // ocurrencias de cada número diferent
+    struct _occurrences *next;
+} occurrences;
 
-void stackPush(int line, int column);
+void stackPush(node** head, int line, int column);
 
-void stackPop();
+void stackPop(node** head);
 
-#endif    // STACK_H
+void printStack(FILE* outfp, node* head);
+
+int copyReversedStack(node* original, node** reversed);
+
+void stackPushOccurrences(occurrences **head, int counter, int value);
+
+int score(occurrences* head );
+
+void deleteStackOccurrences(occurrences** head);
+
+void deleteStack(node** head);
+
+#endif
